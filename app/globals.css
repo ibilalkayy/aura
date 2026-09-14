@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #faf9f6;
+  --ink: #14181a;
+  --brand: #0f6b5c;
+  --brand-dark: #0a4d42;
+  --accent: #e8590c;
+  --accent-dark: #c94a08;
+  --line: #e4e1d9;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-line: var(--line);
+}
+
+body {
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  letter-spacing: -0.01em;
+}
