@@ -71,7 +71,8 @@ Supabase: real auth, a real database, real per-user data isolation.
 - A demo login button on `/login` for quick testing access — requires
   signing up once with the fixed demo credentials noted in
   `app/login/page.tsx`; it's a real account like any other, not an auth
-  bypass
+  bypass. Grant it admin too (see `supabase/make-me-admin.sql`) if you
+  want the Admin link to show up when presenting via that button
 
 ## What's different from Amazon, on purpose
 - No sponsored listings or upsell modules anywhere in the cart/checkout flow

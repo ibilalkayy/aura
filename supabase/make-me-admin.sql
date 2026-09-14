@@ -5,3 +5,12 @@
 update public.profiles
 set is_admin = true
 where id = (select id from auth.users where email = 'you@example.com');
+
+-- If you want the "Continue with demo account" button on /login to also
+-- show the Admin link (useful when presenting/demoing the app), sign up
+-- once via /signup with demo@aura.test / DemoPass123! (see
+-- app/login/page.tsx for the exact credentials), then run:
+--
+-- update public.profiles
+-- set is_admin = true
+-- where id = (select id from auth.users where email = 'demo@aura.test');

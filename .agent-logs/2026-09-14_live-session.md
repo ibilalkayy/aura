@@ -677,3 +677,24 @@ first, since it's a real account going through real auth, not a bypass.
 Ran the full test suite (40 passing, up from 37) and a production build —
 both clean. Smoke-tested all routes, confirmed the demo login button
 present in rendered HTML. Updated README.]
+
+
+[LOG_ENTRY type=PROMPT num=20 session=live-post-gap]
+timestamp: not available
+model: claude-sonnet-5
+
+you should also include the admin page in the navbar in the testing demo
+also so that it can be presented because it is missing
+
+
+[LOG_ENTRY type=RESPONSE num=20 session=live-post-gap]
+timestamp: not available
+model: claude-sonnet-5
+
+[Clarified this isn't a code bug — the Admin link is correctly conditioned
+on the real is_admin database flag, and the demo account simply hasn't
+been granted it yet. Rather than fake the link (which would show it but
+then 403 on click), added the correct fix: an optional block in
+supabase/make-me-admin.sql to grant admin specifically to
+demo@aura.test, and a note in README pointing at it. Ran a build to
+confirm nothing broke (docs/SQL-comment-only change).]
