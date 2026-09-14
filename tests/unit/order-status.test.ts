@@ -37,6 +37,21 @@ describe("canCancelOrder", () => {
     const order = makeOrder({ placedAt: new Date().toISOString(), cancelled: true });
     expect(canCancelOrder(order)).toBe(false);
   });
+
+  it("blocks cancellation once an order has shipped, even well within the 24-hour window", () => {
+    const order = makeOrder({ placedAt: new Date().toISOString(), status: "shipped" });
+    expect(canCancelOrder(order)).toBe(false);
+  });
+
+  it("blocks cancellation once an order has been delivered", () => {
+    const order = makeOrder({ placedAt: new Date().toISOString(), status: "delivered" });
+    expect(canCancelOrder(order)).toBe(false);
+  });
+
+  it("still allows cancellation while an order is merely 'placed' or 'processing'", () => {
+    expect(canCancelOrder(makeOrder({ status: "placed" }))).toBe(true);
+    expect(canCancelOrder(makeOrder({ status: "processing" }))).toBe(true);
+  });
 });
 
 describe("buildStatusSteps", () => {

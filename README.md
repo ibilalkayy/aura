@@ -65,6 +65,13 @@ Supabase: real auth, a real database, real per-user data isolation.
   account deletion
 - All of it is per-user and persisted in a real Postgres database, not
   the browser — sign in on a different device and it's all still there
+- An order can no longer be cancelled once it's marked Shipped or
+  Delivered, regardless of the 24-hour window — the order detail page
+  explains why instead of just hiding the button
+- A demo login button on `/login` for quick testing access — requires
+  signing up once with the fixed demo credentials noted in
+  `app/login/page.tsx`; it's a real account like any other, not an auth
+  bypass
 
 ## What's different from Amazon, on purpose
 - No sponsored listings or upsell modules anywhere in the cart/checkout flow

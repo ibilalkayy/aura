@@ -635,3 +635,45 @@ the security checklist. Explicitly did not claim E2E/Playwright coverage
 that wasn't actually built — flagged it as a reasonable next addition once
 there's a deployed URL to point it at, rather than shipping unverified test
 files. Added a Testing section to README pointing at TESTING.md.]
+
+
+[LOG_ENTRY type=PROMPT num=19 session=live-post-gap]
+timestamp: not available
+model: claude-sonnet-5
+
+now make these changes before working on multi seller
+
+in adding the products page, the save changes and the cancel button should
+be after the variant the additional photos so that when everything is
+setup, it is going to be saved.
+if the product is shipped and delivered then it should not be canceled
+instead a message appear.
+the login and signup password should have an eye emoji that will
+basically show the password if selected.
+put an option for someone to access the account and everything without
+signing up. this is for testing
+
+
+[LOG_ENTRY type=RESPONSE num=19 session=live-post-gap]
+timestamp: not available
+model: claude-sonnet-5
+
+[Checked the admin product form's actual current structure before touching
+it — it turned out the Save/Cancel buttons were already positioned after
+Variants and Additional Photos from an earlier turn, so no change was
+needed there; confirmed and moved on rather than making a redundant edit.
+Updated canCancelOrder() in lib/orders.ts to also block cancellation when
+order.status is "shipped" or "delivered", regardless of the 24-hour
+window. Updated the order detail page to show an accurate message
+depending on the real reason cancellation is blocked (shipped/delivered vs.
+window expired) instead of one generic message. Added 3 new unit tests for
+the status-based blocking. Built a reusable PasswordInput component (eye
+emoji toggle between hidden/visible) and wired it into login, signup, and
+both fields on reset-password. Added a "Continue with demo account"
+button on the login page for quick testing access — autofills and submits
+fixed demo credentials; explicitly documented in a code comment and to the
+user that this requires signing up once with those exact credentials
+first, since it's a real account going through real auth, not a bypass.
+Ran the full test suite (40 passing, up from 37) and a production build —
+both clean. Smoke-tested all routes, confirmed the demo login button
+present in rendered HTML. Updated README.]

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function ResetPasswordPage() {
   const { user, loading, updatePassword } = useAuth();
@@ -65,23 +66,19 @@ export default function ResetPasswordPage() {
       <h1 className="font-display text-2xl text-ink mb-1">Set a new password</h1>
       <p className="mb-6 text-sm text-ink/60">Choose a new password for your account.</p>
       <form onSubmit={onSubmit} className="space-y-3">
-        <input
+        <PasswordInput
           required
-          type="password"
           placeholder="New password (min. 6 characters)"
           minLength={6}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
+          onChange={setPassword}
         />
-        <input
+        <PasswordInput
           required
-          type="password"
           placeholder="Confirm new password"
           minLength={6}
           value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
+          onChange={setConfirm}
         />
         {error && <p className="text-sm text-accent">{error}</p>}
         <button

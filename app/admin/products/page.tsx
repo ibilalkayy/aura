@@ -139,22 +139,19 @@ export default function AdminProductsPage() {
           {products.map((p) => (
             <div key={p.id} className="rounded-2xl border border-line bg-white p-4">
               {editingId === p.id ? (
-                <div className="space-y-4">
-                  <ProductForm
-                    initial={toFormInput(p)}
-                    submitLabel="Save changes"
-                    onCancel={() => setEditingId(null)}
-                    onSubmit={async (input) => {
-                      const result = await adminUpdateProduct(p.id, input);
-                      if (!result.ok) return result;
-                      setEditingId(null);
-                      await load();
-                      return result;
-                    }}
-                  />
-                  <VariantManager productId={p.id} />
-                  <GalleryManager productId={p.id} />
-                </div>
+                <ProductForm
+                  initial={toFormInput(p)}
+                  productId={p.id}
+                  submitLabel="Save changes"
+                  onCancel={() => setEditingId(null)}
+                  onSubmit={async (input) => {
+                    const result = await adminUpdateProduct(p.id, input);
+                    if (!result.ok) return result;
+                    setEditingId(null);
+                    await load();
+                    return result;
+                  }}
+                />
               ) : (
                 <div className="flex items-center gap-4">
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-paper">
@@ -202,11 +199,13 @@ export default function AdminProductsPage() {
 
 function ProductForm({
   initial,
+  productId,
   submitLabel,
   onCancel,
   onSubmit,
 }: {
   initial: ProductInput;
+  productId?: string;
   submitLabel: string;
   onCancel: () => void;
   onSubmit: (input: ProductInput) => Promise<{ ok: boolean; error?: string }>;
@@ -298,6 +297,13 @@ function ProductForm({
       <textarea required placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
       <textarea placeholder="Highlights, one per line" value={highlights} onChange={(e) => setHighlights(e.target.value)} rows={3} className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
 
+      {productId && (
+        <div className="space-y-4">
+          <VariantManager productId={productId} />
+          <GalleryManager productId={productId} />
+        </div>
+      )}
+
       {error && <p className="text-sm text-accent">{error}</p>}
 
       <div className="flex gap-3">
@@ -325,8 +331,11 @@ function VariantManager({ productId }: { productId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
-  const onAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onAdd = async () => {
+    if (!optionType.trim() || !optionValue.trim()) {
+      setError("Enter both a type and a value.");
+      return;
+    }
     setError(null);
     const result = await adminAddVariant(productId, optionType.trim(), optionValue.trim());
     if (!result.ok) {
@@ -367,7 +376,7 @@ function VariantManager({ productId }: { productId: string }) {
         </div>
       )}
 
-      <form onSubmit={onAdd} className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2">
         <input
           required
           placeholder="Type (e.g. Color)"
@@ -382,10 +391,10 @@ function VariantManager({ productId }: { productId: string }) {
           onChange={(e) => setOptionValue(e.target.value)}
           className="rounded-lg border border-line px-3 py-1.5 text-sm outline-none focus:border-brand"
         />
-        <button type="submit" className="rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-dark">
+        <button type="button" onClick={onAdd} className="rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-dark">
           Add
         </button>
-      </form>
+      </div>
       {error && <p className="mt-2 text-sm text-accent">{error}</p>}
     </div>
   );

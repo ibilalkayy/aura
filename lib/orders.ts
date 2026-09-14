@@ -172,6 +172,7 @@ const CANCEL_WINDOW_HOURS = 24;
 
 export function canCancelOrder(order: Order): boolean {
   if (order.cancelled) return false;
+  if (order.status === "shipped" || order.status === "delivered") return false;
   const hoursElapsed = (Date.now() - new Date(order.placedAt).getTime()) / 3_600_000;
   return hoursElapsed < CANCEL_WINDOW_HOURS;
 }

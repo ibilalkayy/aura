@@ -165,6 +165,10 @@ export default function OrderDetailPage({
             >
               Cancel order
             </button>
+          ) : order.status === "shipped" || order.status === "delivered" ? (
+            <p className="text-center text-sm text-ink/40">
+              This order has already {order.status === "delivered" ? "been delivered" : "shipped"} and can no longer be cancelled.
+            </p>
           ) : (
             <p className="text-center text-sm text-ink/40">
               This order can no longer be cancelled — the 24-hour cancellation window has passed.

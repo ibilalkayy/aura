@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function SignUpPage() {
   const { signUp } = useAuth();
@@ -59,14 +60,12 @@ export default function SignUpPage() {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
         />
-        <input
+        <PasswordInput
           required
-          type="password"
           placeholder="Password (min. 6 characters)"
           minLength={6}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
+          onChange={setPassword}
         />
         {error && <p className="text-sm text-accent">{error}</p>}
         <button
