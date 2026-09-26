@@ -6,6 +6,9 @@ import Image from "next/image";
 import { getOrder, cancelOrder, canCancelOrder, getOrderStatusHistory, buildStatusSteps, Order, StatusHistoryEntry } from "@/lib/orders";
 import { getProductsByIds, Product } from "@/lib/products";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import { cn } from "@/lib/utils";
 
 export default function OrderDetailPage({
   params,
@@ -74,57 +77,67 @@ export default function OrderDetailPage({
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-10">
-      <Link href="/orders" className="text-sm text-ink/50 hover:text-ink">
+      <Link href="/orders" className="text-sm text-ink-muted hover:text-ink">
         ← Back to orders
       </Link>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="font-display text-2xl text-ink">{order.id}</h1>
-        <span className="text-sm text-ink/50">
+        <span className="text-sm text-ink-muted">
           Placed {new Date(order.placedAt).toLocaleString()}
         </span>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-line bg-white p-6">
+      <Card className="mt-6 p-6">
         {order.cancelled ? (
           <div className="text-center">
-            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
+            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-danger/10 text-danger">
               ✕
             </div>
             <p className="font-medium text-ink">Order cancelled</p>
-            <p className="mt-1 text-sm text-ink/50">
+            <p className="mt-1 text-sm text-ink-muted">
               Cancelled {order.cancelledAt && new Date(order.cancelledAt).toLocaleString()}
             </p>
           </div>
         ) : (
-          <div className="flex items-start">
-            {steps.map((s, i) => (
-              <div key={s.key} className="flex flex-1 items-start last:flex-none">
-                <div className="flex w-20 flex-col items-center">
-                  <div
-                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
-                      i <= currentIndex ? "bg-brand text-white" : "bg-line text-ink/40"
-                    }`}
+          <ol className="space-y-0">
+            {steps.map((s, i) => {
+              const reached = i <= currentIndex;
+              const isLast = i === steps.length - 1;
+              return (
+                <li key={s.key} className="relative flex gap-4 pb-6 last:pb-0">
+                  {!isLast && (
+                    <span
+                      className={cn(
+                        "absolute left-[11px] top-6 h-[calc(100%-1.5rem)] w-0.5",
+                        i < currentIndex ? "bg-brand" : "bg-line"
+                      )}
+                    />
+                  )}
+                  <span
+                    className={cn(
+                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs",
+                      reached ? "bg-brand text-white" : "border border-line bg-surface"
+                    )}
                   >
-                    {i <= currentIndex ? "✓" : ""}
+                    {reached ? "✓" : ""}
+                  </span>
+                  <div className="pt-0.5">
+                    <p className={cn("text-sm font-medium", reached ? "text-ink" : "text-ink-muted")}>
+                      {s.label}
+                    </p>
+                    <p className="text-xs text-ink-muted">
+                      {s.date ? s.date.toLocaleString() : "Pending"}
+                    </p>
                   </div>
-                  <p className="mt-2 text-center text-xs text-ink/70">{s.label}</p>
-                  <p className="mt-0.5 text-center text-[10px] text-ink/40">
-                    {s.date ? s.date.toLocaleDateString() : "Pending"}
-                  </p>
-                </div>
-                {i < steps.length - 1 && (
-                  <div
-                    className={`mt-3 h-0.5 flex-1 ${i < currentIndex ? "bg-brand" : "bg-line"}`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+                </li>
+              );
+            })}
+          </ol>
         )}
-      </div>
+      </Card>
 
-      <div className="mt-6 rounded-2xl border border-line bg-white p-5">
+      <Card className="mt-6 p-5">
         <h2 className="mb-3 text-sm font-medium text-ink">Items</h2>
         <div className="space-y-3">
           {order.items.map((i) => {
@@ -132,13 +145,13 @@ export default function OrderDetailPage({
             return (
               <div key={i.productId} className="flex items-center gap-3">
                 <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-paper">
-                  {product && <Image src={product.image} alt={i.name} fill className="object-cover" />}
+                  {product && <Image src={product.image} alt={i.name} fill sizes="56px" className="object-cover" />}
                 </div>
                 <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-sm">
-                  <span className="min-w-0 truncate text-ink/80">
+                  <span className="min-w-0 truncate text-ink">
                     {i.name} × {i.quantity}
                   </span>
-                  <span className="shrink-0 text-ink/70">${(i.price * i.quantity).toFixed(2)}</span>
+                  <span className="shrink-0 text-ink-muted">${(i.price * i.quantity).toFixed(2)}</span>
                 </div>
               </div>
             );
@@ -148,29 +161,26 @@ export default function OrderDetailPage({
           <span>Total</span>
           <span>${order.total.toFixed(2)}</span>
         </div>
-      </div>
+      </Card>
 
-      <div className="mt-6 rounded-2xl border border-line bg-white p-5 text-sm">
+      <Card className="mt-6 p-5 text-sm">
         <h2 className="mb-1 font-medium text-ink">Shipping to</h2>
-        <p className="text-ink/60">{order.name}</p>
-        <p className="text-ink/60">{order.address}</p>
-      </div>
+        <p className="text-ink-muted">{order.name}</p>
+        <p className="text-ink-muted">{order.address}</p>
+      </Card>
 
       {!order.cancelled && (
         <div className="mt-6">
           {cancellable ? (
-            <button
-              onClick={() => setConfirmCancel(true)}
-              className="w-full rounded-full border border-accent px-6 py-3 text-sm font-medium text-accent hover:bg-accent hover:text-white"
-            >
+            <Button variant="danger" className="w-full" onClick={() => setConfirmCancel(true)}>
               Cancel order
-            </button>
+            </Button>
           ) : order.status === "shipped" || order.status === "delivered" ? (
-            <p className="text-center text-sm text-ink/40">
+            <p className="text-center text-sm text-ink-muted">
               This order has already {order.status === "delivered" ? "been delivered" : "shipped"} and can no longer be cancelled.
             </p>
           ) : (
-            <p className="text-center text-sm text-ink/40">
+            <p className="text-center text-sm text-ink-muted">
               This order can no longer be cancelled — the 24-hour cancellation window has passed.
             </p>
           )}

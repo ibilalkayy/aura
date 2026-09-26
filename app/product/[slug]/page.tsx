@@ -23,6 +23,9 @@ import AddToCart from "@/components/AddToCart";
 import ProductCard from "@/components/ProductCard";
 import CountryInput from "@/components/CountryInput";
 import ProductGallery from "@/components/ProductGallery";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import Accordion, { AccordionItem } from "@/components/ui/Accordion";
 
 export default function ProductPage({
   params,
@@ -127,8 +130,8 @@ export default function ProductPage({
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
-      <div className="grid gap-10 md:grid-cols-2">
+    <div className="mx-auto max-w-[1320px] px-6 py-10">
+      <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
         <ProductGallery
           images={galleryImages.length > 0 ? galleryImages : [product.image]}
           alt={product.name}
@@ -136,14 +139,14 @@ export default function ProductPage({
 
         <div>
           <p className="text-sm text-brand">{product.category}</p>
-          <h1 className="font-display mt-1 text-2xl text-ink md:text-3xl">
+          <h1 className="font-display mt-1 text-3xl text-ink md:text-4xl">
             {product.name}
           </h1>
           <div className="mt-2">
             {product.reviewCount > 0 ? (
               <Stars rating={product.rating} count={product.reviewCount} />
             ) : (
-              <span className="text-sm text-ink/50">No reviews yet</span>
+              <span className="text-sm text-ink-muted">No reviews yet</span>
             )}
           </div>
 
@@ -152,7 +155,7 @@ export default function ProductPage({
               ${product.price.toFixed(2)}
             </span>
             {product.compareAtPrice && (
-              <span className="text-ink/40 line-through">
+              <span className="text-ink-muted line-through">
                 ${product.compareAtPrice.toFixed(2)}
               </span>
             )}
@@ -160,27 +163,21 @@ export default function ProductPage({
 
           <p className="mt-2 text-sm">
             {product.stock === 0 ? (
-              <span className="text-ink/50">Out of stock</span>
+              <span className="text-ink-muted">Out of stock</span>
             ) : product.stock <= 5 ? (
-              <span className="text-accent">Only {product.stock} left in stock</span>
+              <span className="text-amber-strong">Only {product.stock} left in stock</span>
             ) : (
-              <span className="text-brand">In stock</span>
+              <span className="text-sage-strong">In stock</span>
             )}
           </p>
 
-          <p className="mt-4 text-ink/70">{product.description}</p>
-
-          <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-ink/70">
-            {product.highlights.map((h) => (
-              <li key={h}>{h}</li>
-            ))}
-          </ul>
+          <p className="mt-4 text-ink-muted">{product.description}</p>
 
           {variants.length > 0 && (
             <div className="mt-5 space-y-3">
               {Array.from(new Set(variants.map((v) => v.optionType))).map((optionType) => (
                 <div key={optionType}>
-                  <p className="mb-1.5 text-xs text-ink/50">{optionType}</p>
+                  <p className="mb-1.5 text-xs text-ink-muted">{optionType}</p>
                   <div className="flex flex-wrap gap-2">
                     {variants
                       .filter((v) => v.optionType === optionType)
@@ -192,7 +189,7 @@ export default function ProductPage({
                           className={`rounded-full border px-3 py-1.5 text-sm ${
                             selectedOptions[optionType] === v.optionValue
                               ? "border-brand bg-brand text-white"
-                              : "border-line bg-white text-ink/70 hover:border-brand"
+                              : "border-line bg-surface text-ink-muted hover:border-brand"
                           }`}
                         >
                           {v.optionValue}
@@ -201,7 +198,7 @@ export default function ProductPage({
                   </div>
                 </div>
               ))}
-              <p className="text-xs text-ink/40">
+              <p className="text-xs text-ink-muted">
                 Selecting an option doesn&apos;t change price or stock yet — this store
                 doesn&apos;t track inventory per variant.
               </p>
@@ -212,7 +209,7 @@ export default function ProductPage({
             <AddToCart productId={product.id} stock={product.stock} />
           </div>
 
-          <div className="mt-6 rounded-xl border border-line bg-white p-4">
+          <Card className="mt-6 p-4">
             <p className="mb-2 text-sm font-medium text-ink">Estimate delivery</p>
             <CountryInput
               value={deliveryCountry}
@@ -223,7 +220,7 @@ export default function ProductPage({
               (() => {
                 const est = estimateDelivery(deliveryCountry);
                 return (
-                  <p className="mt-2 text-sm text-ink/70">
+                  <p className="mt-2 text-sm text-ink-muted">
                     <span className="font-medium text-ink">
                       {est.min}–{est.max} business days
                     </span>{" "}
@@ -231,10 +228,24 @@ export default function ProductPage({
                   </p>
                 );
               })()}
-            <p className="mt-2 text-xs text-ink/40">
+            <p className="mt-2 text-xs text-ink-muted">
               Estimate only, based on region — not a live carrier quote.
             </p>
-          </div>
+          </Card>
+
+          {product.highlights.length > 0 && (
+            <div className="mt-6">
+              <Accordion>
+                <AccordionItem title="Highlights" defaultOpen>
+                  <ul className="list-disc space-y-1 pl-5">
+                    {product.highlights.map((h) => (
+                      <li key={h}>{h}</li>
+                    ))}
+                  </ul>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          )}
         </div>
       </div>
 
@@ -245,12 +256,9 @@ export default function ProductPage({
           </h2>
           {user ? (
             !showForm && (
-              <button
-                onClick={() => setShowForm(true)}
-                className="rounded-full border border-brand px-4 py-2 text-sm font-medium text-brand hover:bg-brand hover:text-white"
-              >
+              <Button variant="outline" onClick={() => setShowForm(true)}>
                 Write a review
-              </button>
+              </Button>
             )
           ) : (
             <a href="/login" className="text-sm text-brand hover:underline">
@@ -260,16 +268,16 @@ export default function ProductPage({
         </div>
 
         {showForm && (
-          <form onSubmit={onSubmitReview} className="mt-5 space-y-3 rounded-2xl border border-line bg-white p-5">
+          <form onSubmit={onSubmitReview} className="mt-5 space-y-3 rounded-2xl border border-line bg-surface p-5">
             <div>
-              <label className="mb-1 block text-xs text-ink/50">Your rating</label>
+              <label className="mb-1 block text-xs text-ink-muted">Your rating</label>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => setRating(n)}
-                    className={`text-2xl ${n <= rating ? "text-accent" : "text-line"}`}
+                    className={`text-2xl ${n <= rating ? "text-amber" : "text-line"}`}
                     aria-label={`${n} stars`}
                   >
                     ★
@@ -292,41 +300,33 @@ export default function ProductPage({
               rows={4}
               className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
             />
-            {error && <p className="text-sm text-accent">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
             <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={submitting}
-                className="rounded-full bg-brand px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
-              >
+              <Button type="submit" disabled={submitting}>
                 {submitting ? "Posting…" : "Post review"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="rounded-full border border-line px-6 py-2.5 text-sm text-ink/70 hover:border-brand"
-              >
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         )}
 
         <div className="mt-6 grid gap-6 sm:grid-cols-2">
           {reviews.length === 0 && !showForm && (
-            <p className="text-sm text-ink/50">
+            <p className="text-sm text-ink-muted">
               No reviews yet — be the first to write one.
             </p>
           )}
           {reviews.map((r) => (
-            <div key={r.id} className="rounded-xl border border-line bg-white p-4">
+            <Card key={r.id} className="p-4">
               <Stars rating={r.rating} size="sm" />
               <p className="mt-2 text-sm font-medium text-ink">{r.title}</p>
-              <p className="mt-1 text-sm text-ink/60">{r.body}</p>
-              <p className="mt-2 text-xs text-ink/40">
+              <p className="mt-1 text-sm text-ink-muted">{r.body}</p>
+              <p className="mt-2 text-xs text-ink-muted">
                 — {r.authorName} · {new Date(r.createdAt).toLocaleDateString()}
               </p>
-            </div>
+            </Card>
           ))}
         </div>
       </section>

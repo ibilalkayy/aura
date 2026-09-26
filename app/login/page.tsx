@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import PasswordInput from "@/components/PasswordInput";
+import AuthShell from "@/components/AuthShell";
+import Button from "@/components/ui/Button";
 
 export default function LoginPage() {
   const { logIn } = useAuth();
@@ -45,46 +47,43 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="font-display text-2xl text-ink mb-1">Log in</h1>
-      <p className="mb-6 text-sm text-ink/60">Sign in with your email and password.</p>
-      <form onSubmit={onSubmit} className="space-y-3">
-        <input
-          required
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
-        />
-        <PasswordInput required placeholder="Password" value={password} onChange={setPassword} />
-        <div className="text-right">
-          <Link href="/forgot-password" className="text-xs text-ink/50 hover:text-brand">
-            Forgot password?
-          </Link>
-        </div>
-        {error && <p className="text-sm text-accent">{error}</p>}
-        <button
-          type="submit"
+    <div className="px-4">
+      <AuthShell title="Log in" subtitle="Sign in with your email and password.">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <input
+            required
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
+          />
+          <PasswordInput required placeholder="Password" value={password} onChange={setPassword} />
+          <div className="text-right">
+            <Link href="/forgot-password" className="text-xs text-ink-muted hover:text-brand">
+              Forgot password?
+            </Link>
+          </div>
+          {error && <p className="text-sm text-danger">{error}</p>}
+          <Button type="submit" disabled={submitting} className="w-full">
+            {submitting ? "Logging in…" : "Log in"}
+          </Button>
+        </form>
+        <Button
+          variant="outline"
+          onClick={onDemoLogin}
           disabled={submitting}
-          className="w-full rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
+          className="mt-3 w-full border-dashed"
         >
-          {submitting ? "Logging in…" : "Log in"}
-        </button>
-      </form>
-      <button
-        onClick={onDemoLogin}
-        disabled={submitting}
-        className="mt-3 w-full rounded-full border border-dashed border-line px-6 py-3 text-sm text-ink/60 hover:border-brand hover:text-brand disabled:opacity-60"
-      >
-        Continue with demo account (testing)
-      </button>
-      <p className="mt-4 text-sm text-ink/60">
-        No account yet?{" "}
-        <Link href="/signup" className="text-brand hover:underline">
-          Sign up
-        </Link>
-      </p>
+          Continue with demo account (testing)
+        </Button>
+        <p className="mt-4 text-sm text-ink-muted">
+          No account yet?{" "}
+          <Link href="/signup" className="text-brand hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </AuthShell>
     </div>
   );
 }

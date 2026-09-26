@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
+/*
+ * Aura Editorial design tokens.
+ *
+ * Every existing token (paper, ink, brand, brand-dark, accent, accent-dark,
+ * line) keeps its original light-mode value and meaning — nothing currently
+ * on screen changes from this file alone. This phase only ADDS: dark-mode
+ * variants for all of them, and new tokens (surface, ink-muted, sage,
+ * amber, danger) for components built from here on. Pages get migrated to
+ * the new tokens where it makes sense as each one is redesigned in later
+ * phases, not all at once.
+ */
+
 :root {
+  /* Existing tokens — light (unchanged values) */
   --paper: #faf9f6;
   --ink: #14181a;
   --brand: #0f6b5c;
@@ -8,6 +21,61 @@
   --accent: #e8590c;
   --accent-dark: #c94a08;
   --line: #e4e1d9;
+
+  /* New tokens — light */
+  --surface: #ffffff;
+  --ink-muted: #6b6459;
+  --sage: #7c9a83;
+  --sage-strong: #5c7963;
+  --amber: #c98a2c;
+  --amber-strong: #a56f1e;
+  --danger: #b3402f;
+  --danger-strong: #8f3125;
+
+  --radius-card: 1rem;
+  --motion-fast: 150ms;
+  --motion-slow: 250ms;
+  --max-width-shell: 1320px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #161513;
+    --ink: #f3efe7;
+    --brand: #3fa08c;
+    --brand-dark: #63b8a6;
+    --accent: #e07a4a;
+    --accent-dark: #ec9269;
+    --line: #33302a;
+
+    --surface: #201e1b;
+    --ink-muted: #a49c8d;
+    --sage: #8fac96;
+    --sage-strong: #a6c1ac;
+    --amber: #d9a04a;
+    --amber-strong: #e6b467;
+    --danger: #d9705f;
+    --danger-strong: #e6897a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #161513;
+  --ink: #f3efe7;
+  --brand: #3fa08c;
+  --brand-dark: #63b8a6;
+  --accent: #e07a4a;
+  --accent-dark: #ec9269;
+  --line: #33302a;
+
+  --surface: #201e1b;
+  --ink-muted: #a49c8d;
+  --sage: #8fac96;
+  --sage-strong: #a6c1ac;
+  --amber: #d9a04a;
+  --amber-strong: #e6b467;
+  --danger: #d9705f;
+  --danger-strong: #e6897a;
 }
 
 @theme inline {
@@ -18,13 +86,28 @@
   --color-accent: var(--accent);
   --color-accent-dark: var(--accent-dark);
   --color-line: var(--line);
+
+  --color-surface: var(--surface);
+  --color-ink-muted: var(--ink-muted);
+  --color-sage: var(--sage);
+  --color-sage-strong: var(--sage-strong);
+  --color-amber: var(--amber);
+  --color-amber-strong: var(--amber-strong);
+  --color-danger: var(--danger);
+  --color-danger-strong: var(--danger-strong);
+
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "Instrument Sans", -apple-system, "Segoe UI", system-ui, sans-serif;
 }
 
 body {
-  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--ink);
+  transition: background-color var(--motion-slow) ease, color var(--motion-slow) ease;
 }
 
 .font-display {
-  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-family: var(--font-display);
   letter-spacing: -0.01em;
 }

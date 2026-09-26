@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import PasswordInput from "@/components/PasswordInput";
+import AuthShell from "@/components/AuthShell";
+import Button from "@/components/ui/Button";
 
 export default function ResetPasswordPage() {
   const { user, loading, updatePassword } = useAuth();
@@ -37,58 +39,50 @@ export default function ResetPasswordPage() {
 
   if (!user) {
     return (
-      <div className="mx-auto max-w-sm px-6 py-16 text-center">
-        <h1 className="font-display text-2xl text-ink">This link isn't valid</h1>
-        <p className="mt-2 text-sm text-ink/60">
-          Reset links expire after a while, or may have already been used.
-        </p>
-        <Link
-          href="/forgot-password"
-          className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark"
-        >
-          Request a new link
-        </Link>
+      <div className="px-4">
+        <AuthShell title="This link isn't valid" subtitle="Reset links expire after a while, or may have already been used.">
+          <Link href="/forgot-password" className="inline-block">
+            <Button>Request a new link</Button>
+          </Link>
+        </AuthShell>
       </div>
     );
   }
 
   if (done) {
     return (
-      <div className="mx-auto max-w-sm px-6 py-16 text-center">
-        <h1 className="font-display text-2xl text-ink">Password updated</h1>
-        <p className="mt-2 text-sm text-ink/60">Taking you to your account…</p>
+      <div className="px-4">
+        <AuthShell title="Password updated" subtitle="Taking you to your account…">
+          <div />
+        </AuthShell>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="font-display text-2xl text-ink mb-1">Set a new password</h1>
-      <p className="mb-6 text-sm text-ink/60">Choose a new password for your account.</p>
-      <form onSubmit={onSubmit} className="space-y-3">
-        <PasswordInput
-          required
-          placeholder="New password (min. 6 characters)"
-          minLength={6}
-          value={password}
-          onChange={setPassword}
-        />
-        <PasswordInput
-          required
-          placeholder="Confirm new password"
-          minLength={6}
-          value={confirm}
-          onChange={setConfirm}
-        />
-        {error && <p className="text-sm text-accent">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
-        >
-          {submitting ? "Updating…" : "Update password"}
-        </button>
-      </form>
+    <div className="px-4">
+      <AuthShell title="Set a new password" subtitle="Choose a new password for your account.">
+        <form onSubmit={onSubmit} className="space-y-3">
+          <PasswordInput
+            required
+            placeholder="New password (min. 6 characters)"
+            minLength={6}
+            value={password}
+            onChange={setPassword}
+          />
+          <PasswordInput
+            required
+            placeholder="Confirm new password"
+            minLength={6}
+            value={confirm}
+            onChange={setConfirm}
+          />
+          {error && <p className="text-sm text-danger">{error}</p>}
+          <Button type="submit" disabled={submitting} className="w-full">
+            {submitting ? "Updating…" : "Update password"}
+          </Button>
+        </form>
+      </AuthShell>
     </div>
   );
 }

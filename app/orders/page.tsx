@@ -6,6 +6,8 @@ import Image from "next/image";
 import { getOrders, Order, OrderStatusKey, STATUS_LABELS } from "@/lib/orders";
 import { useAuth } from "@/lib/auth-context";
 import { getProductsByIds, Product } from "@/lib/products";
+import Button from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
 type StatusFilter = "all" | OrderStatusKey | "cancelled";
 
@@ -47,11 +49,8 @@ export default function OrdersPage() {
     return (
       <div className="mx-auto max-w-sm px-6 py-20 text-center">
         <h1 className="font-display text-2xl text-ink">Sign in to see your orders</h1>
-        <Link
-          href="/login"
-          className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark"
-        >
-          Sign in
+        <Link href="/login" className="mt-6 inline-block">
+          <Button>Sign in</Button>
         </Link>
       </div>
     );
@@ -96,11 +95,12 @@ export default function OrdersPage() {
           <button
             key={f.key}
             onClick={() => setStatusFilter(f.key)}
-            className={`rounded-full border px-3 py-1.5 text-xs ${
+            className={cn(
+              "rounded-full border px-3 py-1.5 text-xs",
               statusFilter === f.key
                 ? "border-brand bg-brand text-white"
-                : "border-line bg-white text-ink/70 hover:border-brand"
-            }`}
+                : "border-line bg-surface text-ink-muted hover:border-brand"
+            )}
           >
             {f.label}
           </button>
@@ -112,12 +112,12 @@ export default function OrdersPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search orders by order ID or product name"
-          className="mb-6 w-full rounded-full border border-line bg-white px-4 py-2.5 text-sm outline-none focus:border-brand"
+          className="mb-6 w-full rounded-full border border-line bg-surface px-4 py-2.5 text-sm outline-none focus:border-brand"
         />
       )}
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-ink/50">No orders match this filter.</p>
+        <p className="text-sm text-ink-muted">No orders match this filter.</p>
       ) : (
         <div className="space-y-4">
           {filtered.map((o) => {
@@ -126,19 +126,18 @@ export default function OrdersPage() {
               <Link
                 key={o.id}
                 href={`/orders/${o.id}`}
-                className="block rounded-2xl border border-line bg-white p-5 transition hover:border-brand/40"
+                className="block rounded-2xl border border-line bg-surface p-5 transition hover:border-brand/40"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
                   <span className="font-medium text-ink">{o.id}</span>
-                  <span className="text-ink/50">
+                  <span className="text-ink-muted">
                     {new Date(o.placedAt).toLocaleDateString()}
                   </span>
                   <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                      o.cancelled
-                        ? "bg-accent/10 text-accent"
-                        : "bg-brand/10 text-brand"
-                    }`}
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs font-medium",
+                      o.cancelled ? "bg-danger/10 text-danger" : "bg-sage/15 text-sage-strong"
+                    )}
                   >
                     {statusLabel}
                   </span>
@@ -152,12 +151,12 @@ export default function OrdersPage() {
                       <div key={i.productId} className="flex items-center gap-3">
                         <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-paper">
                           {product && (
-                            <Image src={product.image} alt={i.name} fill className="object-cover" />
+                            <Image src={product.image} alt={i.name} fill sizes="56px" className="object-cover" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1 text-sm">
-                          <p className="truncate text-ink/80">{i.name}</p>
-                          <p className="text-ink/50">
+                          <p className="truncate text-ink">{i.name}</p>
+                          <p className="text-ink-muted">
                             Qty {i.quantity} · ${i.price.toFixed(2)} each
                           </p>
                         </div>

@@ -66,7 +66,7 @@ export default function PhoneInput({
 
       <div className="flex flex-1 items-center overflow-hidden rounded-lg border border-line focus-within:border-brand">
         {matched && (
-          <span className="shrink-0 px-2 text-sm text-ink/60">{matched.dialCode}</span>
+          <span className="shrink-0 px-2 text-sm text-ink-muted">{matched.dialCode}</span>
         )}
         <input
           type="tel"

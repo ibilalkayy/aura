@@ -23,6 +23,8 @@ import {
   ProductImage,
 } from "@/lib/products";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import Button from "@/components/ui/Button";
+import Drawer from "@/components/ui/Drawer";
 
 const emptyForm: ProductInput = {
   slug: "",
@@ -53,7 +55,7 @@ function toFormInput(p: Product): ProductInput {
 export default function AdminProductsPage() {
   const { user, loading: authLoading } = useAuth();
   const [products, setProducts] = useState<Product[] | null>(null);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Product | null>(null);
   const [creating, setCreating] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,8 +72,8 @@ export default function AdminProductsPage() {
     return (
       <div className="mx-auto max-w-sm px-6 py-20 text-center">
         <h1 className="font-display text-2xl text-ink">Sign in required</h1>
-        <Link href="/login" className="mt-6 inline-block rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark">
-          Sign in
+        <Link href="/login" className="mt-6 inline-block">
+          <Button>Sign in</Button>
         </Link>
       </div>
     );
@@ -81,7 +83,7 @@ export default function AdminProductsPage() {
     return (
       <div className="mx-auto max-w-sm px-6 py-20 text-center">
         <h1 className="font-display text-2xl text-ink">Not authorized</h1>
-        <p className="mt-2 text-sm text-ink/60">This page is for admin accounts only.</p>
+        <p className="mt-2 text-sm text-ink-muted">This page is for admin accounts only.</p>
       </div>
     );
   }
@@ -98,25 +100,52 @@ export default function AdminProductsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
-      <Link href="/admin" className="text-sm text-ink/50 hover:text-ink">
+      <Link href="/admin" className="text-sm text-ink-muted hover:text-ink">
         ← Admin
       </Link>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl text-ink">Manage products</h1>
-        {!creating && (
-          <button
-            onClick={() => setCreating(true)}
-            className="rounded-full bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark"
-          >
-            + Add product
-          </button>
-        )}
+        <Button onClick={() => setCreating(true)}>+ Add product</Button>
       </div>
 
-      {error && <p className="mt-4 text-sm text-accent">{error}</p>}
+      {error && <p className="mt-4 text-sm text-danger">{error}</p>}
 
-      {creating && (
-        <div className="mt-6">
+      {products === null ? (
+        <p className="mt-6 text-sm text-ink-muted">Loading…</p>
+      ) : (
+        <div className="mt-6 space-y-3">
+          {products.map((p) => (
+            <div key={p.id} className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-4">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-paper">
+                <Image src={p.image} alt={p.name} fill sizes="64px" className="object-cover" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-ink">{p.name}</p>
+                <p className="text-sm text-ink-muted">
+                  {p.category} · ${p.price.toFixed(2)} · Stock: {p.stock}
+                </p>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <button
+                  onClick={() => setEditing(p)}
+                  className="rounded-full border border-line px-3 py-1.5 text-xs text-ink-muted hover:border-brand hover:text-brand"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => setConfirmDeleteId(p.id)}
+                  className="rounded-full border border-line px-3 py-1.5 text-xs text-ink-muted hover:border-danger hover:text-danger"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <Drawer open={creating} onClose={() => setCreating(false)} title="Add product">
+        <div className="p-5">
           <ProductForm
             initial={emptyForm}
             submitLabel="Create product"
@@ -130,59 +159,27 @@ export default function AdminProductsPage() {
             }}
           />
         </div>
-      )}
+      </Drawer>
 
-      {products === null ? (
-        <p className="mt-6 text-sm text-ink/50">Loading…</p>
-      ) : (
-        <div className="mt-6 space-y-3">
-          {products.map((p) => (
-            <div key={p.id} className="rounded-2xl border border-line bg-white p-4">
-              {editingId === p.id ? (
-                <ProductForm
-                  initial={toFormInput(p)}
-                  productId={p.id}
-                  submitLabel="Save changes"
-                  onCancel={() => setEditingId(null)}
-                  onSubmit={async (input) => {
-                    const result = await adminUpdateProduct(p.id, input);
-                    if (!result.ok) return result;
-                    setEditingId(null);
-                    await load();
-                    return result;
-                  }}
-                />
-              ) : (
-                <div className="flex items-center gap-4">
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-paper">
-                    <Image src={p.image} alt={p.name} fill className="object-cover" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-ink">{p.name}</p>
-                    <p className="text-sm text-ink/60">
-                      {p.category} · ${p.price.toFixed(2)} · Stock: {p.stock}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-2">
-                    <button
-                      onClick={() => setEditingId(p.id)}
-                      className="rounded-full border border-line px-3 py-1.5 text-xs text-ink/70 hover:border-brand hover:text-brand"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => setConfirmDeleteId(p.id)}
-                      className="rounded-full border border-line px-3 py-1.5 text-xs text-ink/50 hover:border-accent hover:text-accent"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      <Drawer open={editing !== null} onClose={() => setEditing(null)} title="Edit product">
+        {editing && (
+          <div className="p-5">
+            <ProductForm
+              initial={toFormInput(editing)}
+              productId={editing.id}
+              submitLabel="Save changes"
+              onCancel={() => setEditing(null)}
+              onSubmit={async (input) => {
+                const result = await adminUpdateProduct(editing.id, input);
+                if (!result.ok) return result;
+                setEditing(null);
+                await load();
+                return result;
+              }}
+            />
+          </div>
+        )}
+      </Drawer>
 
       <ConfirmDialog
         open={confirmDeleteId !== null}
@@ -266,14 +263,14 @@ function ProductForm({
   };
 
   return (
-    <form onSubmit={submit} className="space-y-3 rounded-2xl border border-line bg-paper p-4">
+    <form onSubmit={submit} className="space-y-3">
       <div>
-        <label className="mb-1 block text-xs text-ink/50">Product image</label>
+        <label className="mb-1 block text-xs text-ink-muted">Product image</label>
         <div className="flex items-center gap-4">
-          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-line bg-white">
-            {image && <Image src={image} alt="" fill className="object-cover" />}
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-line bg-paper">
+            {image && <Image src={image} alt="" fill sizes="80px" className="object-cover" />}
           </div>
-          <label className="inline-block cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-xs text-ink/70 hover:border-brand">
+          <label className="inline-block cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-xs text-ink-muted hover:border-brand">
             {uploading ? "Uploading…" : image ? "Replace photo" : "Upload photo"}
             <input type="file" accept="image/*" onChange={onImageChange} className="hidden" disabled={uploading} />
           </label>
@@ -281,21 +278,21 @@ function ProductForm({
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <input required placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
-        <input required placeholder="Slug (url-friendly-name)" value={slug} onChange={(e) => setSlug(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
+        <input required placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
+        <input required placeholder="Slug (url-friendly-name)" value={slug} onChange={(e) => setSlug(e.target.value)} className="rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
       </div>
-      <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand">
+      <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand">
         {categories.map((c) => (
           <option key={c} value={c}>{c}</option>
         ))}
       </select>
       <div className="grid grid-cols-3 gap-3">
-        <input required type="number" step="0.01" min="0" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
-        <input type="number" step="0.01" min="0" placeholder="Compare-at price (optional)" value={compareAtPrice} onChange={(e) => setCompareAtPrice(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
-        <input required type="number" min="0" placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} className="rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
+        <input required type="number" step="0.01" min="0" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} className="rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
+        <input type="number" step="0.01" min="0" placeholder="Compare-at price (optional)" value={compareAtPrice} onChange={(e) => setCompareAtPrice(e.target.value)} className="rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
+        <input required type="number" min="0" placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} className="rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
       </div>
-      <textarea required placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
-      <textarea placeholder="Highlights, one per line" value={highlights} onChange={(e) => setHighlights(e.target.value)} rows={3} className="w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand" />
+      <textarea required placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
+      <textarea placeholder="Highlights, one per line" value={highlights} onChange={(e) => setHighlights(e.target.value)} rows={3} className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
 
       {productId && (
         <div className="space-y-4">
@@ -304,15 +301,15 @@ function ProductForm({
         </div>
       )}
 
-      {error && <p className="text-sm text-accent">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
-      <div className="flex gap-3">
-        <button type="submit" disabled={submitting} className="flex-1 rounded-full bg-brand px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60">
+      <div className="flex gap-3 pt-2">
+        <Button type="submit" disabled={submitting} className="flex-1">
           {submitting ? "Saving…" : submitLabel}
-        </button>
-        <button type="button" onClick={onCancel} className="rounded-full border border-line px-6 py-2.5 text-sm text-ink/70 hover:border-brand">
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -353,11 +350,11 @@ function VariantManager({ productId }: { productId: string }) {
   };
 
   return (
-    <div className="rounded-2xl border border-dashed border-line bg-white p-4">
+    <div className="rounded-2xl border border-dashed border-line bg-paper p-4">
       <p className="mb-1 text-sm font-medium text-ink">Variants</p>
-      <p className="mb-3 text-xs text-ink/40">
+      <p className="mb-3 text-xs text-ink-muted">
         Display-only options (e.g. Color, Size) — shown on the product page,
-        but don&apos;t yet affect price, stock, or the cart.
+        but don&apos;t yet affect price, stock, or the bag.
       </p>
 
       {variants.length > 0 && (
@@ -365,10 +362,10 @@ function VariantManager({ productId }: { productId: string }) {
           {variants.map((v) => (
             <span
               key={v.id}
-              className="flex items-center gap-1.5 rounded-full border border-line bg-paper px-3 py-1 text-xs text-ink/70"
+              className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-muted"
             >
               {v.optionType}: {v.optionValue}
-              <button onClick={() => onDelete(v.id)} className="text-ink/40 hover:text-accent">
+              <button onClick={() => onDelete(v.id)} className="text-ink-muted hover:text-danger">
                 ×
               </button>
             </span>
@@ -382,20 +379,20 @@ function VariantManager({ productId }: { productId: string }) {
           placeholder="Type (e.g. Color)"
           value={optionType}
           onChange={(e) => setOptionType(e.target.value)}
-          className="rounded-lg border border-line px-3 py-1.5 text-sm outline-none focus:border-brand"
+          className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm outline-none focus:border-brand"
         />
         <input
           required
           placeholder="Value (e.g. Red)"
           value={optionValue}
           onChange={(e) => setOptionValue(e.target.value)}
-          className="rounded-lg border border-line px-3 py-1.5 text-sm outline-none focus:border-brand"
+          className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm outline-none focus:border-brand"
         />
-        <button type="button" onClick={onAdd} className="rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white hover:bg-brand-dark">
+        <Button type="button" size="sm" onClick={onAdd}>
           Add
-        </button>
+        </Button>
       </div>
-      {error && <p className="mt-2 text-sm text-accent">{error}</p>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
     </div>
   );
 }
@@ -436,22 +433,21 @@ function GalleryManager({ productId }: { productId: string }) {
   };
 
   return (
-    <div className="rounded-2xl border border-dashed border-line bg-white p-4">
+    <div className="rounded-2xl border border-dashed border-line bg-paper p-4">
       <p className="mb-1 text-sm font-medium text-ink">Additional photos</p>
-      <p className="mb-3 text-xs text-ink/40">
-        Shown alongside the main product image in a left/right-navigable
-        gallery on the product page.
+      <p className="mb-3 text-xs text-ink-muted">
+        Shown alongside the main product image in the product-page gallery.
       </p>
 
       {images.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
           {images.map((img) => (
             <div key={img.id} className="relative h-16 w-16 overflow-hidden rounded-lg border border-line">
-              <Image src={img.url} alt="" fill className="object-cover" />
+              <Image src={img.url} alt="" fill sizes="64px" className="object-cover" />
               <button
                 onClick={() => onDelete(img.id)}
                 aria-label="Remove photo"
-                className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-ink/70 text-[10px] text-white hover:bg-accent"
+                className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-ink/70 text-[10px] text-white hover:bg-danger"
               >
                 ×
               </button>
@@ -460,11 +456,11 @@ function GalleryManager({ productId }: { productId: string }) {
         </div>
       )}
 
-      <label className="inline-block cursor-pointer rounded-full border border-line bg-white px-4 py-2 text-xs text-ink/70 hover:border-brand">
+      <label className="inline-block cursor-pointer rounded-full border border-line bg-surface px-4 py-2 text-xs text-ink-muted hover:border-brand">
         {uploading ? "Uploading…" : "+ Add photo"}
         <input type="file" accept="image/*" onChange={onUpload} className="hidden" disabled={uploading} />
       </label>
-      {error && <p className="mt-2 text-sm text-accent">{error}</p>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
     </div>
   );
 }

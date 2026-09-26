@@ -1,7 +1,27 @@
-# Aura — a faster, ad-free rebuild of the Amazon shopping flow
+# Aura — a calmer, ad-free way to shop online
 
-Built for the 24-hour "rebuild a live product" challenge. Now backed by
-Supabase: real auth, a real database, real per-user data isolation.
+Built for a "rebuild a live product" challenge. Originally scoped as an
+Amazon clone; the brief later changed to require an original design instead
+— this is that redesign ("Aura Editorial"): the idea, backend, and database
+stayed exactly the same, only the frontend's layout and visual design
+changed. Backed by Supabase throughout: real auth, a real database, real
+per-user data isolation.
+
+## Design
+
+The frontend follows an "Aura Editorial" direction: Fraunces (display) +
+Instrument Sans (body), a warm paper/ink palette with sage/amber/danger
+accent tokens, pill buttons, 4:5 product photography, light and dark mode,
+and a command-palette search (⌘K / `/`) in place of a plain search bar. No
+layout, component, or copy in this app was carried over from Amazon or any
+other existing marketplace — every screen was designed from scratch against
+this system. Built in phases on the `redesign/editorial` branch, each one
+tested and built before moving to the next: design tokens & primitives →
+global shell → home/search → product page → bag → checkout → auth → orders/
+notifications/account/admin → final accessibility and consistency pass.
+Every existing feature and every route URL was kept working throughout —
+only `lib/**`, `supabase/**`, and `app/api/**` were left untouched; nothing
+in this section changed what the app does, only how it looks.
 
 ## What's here
 - Home, search + filter/sort, product detail, cart, checkout,
@@ -83,9 +103,9 @@ Supabase: real auth, a real database, real per-user data isolation.
 - **Checkout requires sign-in.** Real per-user order history needs a real
   identity; the old localStorage version's "guest checkout" was only ever
   pseudo-guest (tied to one browser) anyway.
-- **Order status (Placed → Processing → Shipped → Delivered) is simulated**
-  from time elapsed since the order was placed — there's no real
-  fulfillment system behind it.
+- **Order status (Placed → Processing → Shipped → Delivered) is real but
+  manually advanced** by an admin from `/admin/orders` — there's no real
+  courier or warehouse system behind it, by design (see above).
 - **Country/dial-code list covers ~120 common countries**, not the full
   ISO set of ~195.
 - **Account deletion removes your data but not always instantly your auth

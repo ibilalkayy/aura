@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
   const [index, setIndex] = useState(0);
@@ -12,7 +14,7 @@ export default function ProductGallery({ images, alt }: { images: string[]; alt:
 
   return (
     <div>
-      <div className="relative aspect-square overflow-hidden rounded-2xl border border-line bg-white">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-line bg-surface">
         <Image
           src={images[safeIndex]}
           alt={alt}
@@ -27,16 +29,16 @@ export default function ProductGallery({ images, alt }: { images: string[]; alt:
             <button
               onClick={prev}
               aria-label="Previous photo"
-              className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink shadow hover:bg-white"
+              className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-surface/90 text-ink shadow hover:bg-surface"
             >
-              ‹
+              <ChevronLeft size={18} />
             </button>
             <button
               onClick={next}
               aria-label="Next photo"
-              className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-ink shadow hover:bg-white"
+              className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-surface/90 text-ink shadow hover:bg-surface"
             >
-              ›
+              <ChevronRight size={18} />
             </button>
             <span className="absolute bottom-2 right-2 rounded-full bg-ink/70 px-2 py-0.5 text-xs text-white">
               {safeIndex + 1}/{images.length}
@@ -51,11 +53,12 @@ export default function ProductGallery({ images, alt }: { images: string[]; alt:
             <button
               key={src + i}
               onClick={() => setIndex(i)}
-              className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border ${
+              className={cn(
+                "relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border",
                 i === safeIndex ? "border-brand" : "border-line"
-              }`}
+              )}
             >
-              <Image src={src} alt="" fill className="object-cover" />
+              <Image src={src} alt="" fill sizes="64px" className="object-cover" />
             </button>
           ))}
         </div>

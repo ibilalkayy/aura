@@ -9,17 +9,17 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className={`group flex flex-col rounded-2xl border border-line bg-white p-4 transition hover:border-brand/40 hover:shadow-sm ${
+      className={`group flex flex-col rounded-2xl border border-line bg-surface p-3 transition hover:border-brand/40 hover:shadow-sm ${
         outOfStock ? "opacity-60" : ""
       }`}
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-paper">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-paper">
         <Image
           src={product.image}
           alt={product.name}
           fill
           sizes="(min-width: 1024px) 22vw, 45vw"
-          className="object-cover transition group-hover:scale-[1.03]"
+          className="object-cover transition duration-300 group-hover:scale-[1.03]"
         />
         {outOfStock && (
           <span className="absolute left-2 top-2 rounded-full bg-ink/80 px-2 py-1 text-xs font-medium text-white">
@@ -35,7 +35,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.reviewCount > 0 ? (
             <Stars rating={product.rating} count={product.reviewCount} size="sm" />
           ) : (
-            <span className="text-xs text-ink/40">No reviews yet</span>
+            <span className="text-xs text-ink-muted">No reviews yet</span>
           )}
         </div>
         <div className="mt-2 flex items-baseline gap-2">
@@ -43,13 +43,13 @@ export default function ProductCard({ product }: { product: Product }) {
             ${product.price.toFixed(2)}
           </span>
           {product.compareAtPrice && (
-            <span className="text-xs text-ink/40 line-through">
+            <span className="text-xs text-ink-muted line-through">
               ${product.compareAtPrice.toFixed(2)}
             </span>
           )}
         </div>
         {!outOfStock && product.stock <= 5 && (
-          <span className="mt-1 text-xs text-accent">Only {product.stock} left</span>
+          <span className="mt-1 text-xs text-amber-strong">Only {product.stock} left</span>
         )}
       </div>
     </Link>

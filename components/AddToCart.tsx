@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import Button from "@/components/ui/Button";
 
 export default function AddToCart({ productId, stock }: { productId: string; stock: number }) {
   const { addToCart } = useCart();
@@ -15,11 +16,11 @@ export default function AddToCart({ productId, stock }: { productId: string; sto
       <div className="flex flex-col gap-2">
         <button
           disabled
-          className="cursor-not-allowed rounded-full bg-line px-6 py-3 text-sm font-medium text-ink/40"
+          className="cursor-not-allowed rounded-full bg-line px-6 py-3 text-sm font-medium text-ink-muted"
         >
           Out of stock
         </button>
-        <p className="text-sm text-ink/50">Check back later — this item is currently sold out.</p>
+        <p className="text-sm text-ink-muted">Check back later — this item is currently sold out.</p>
       </div>
     );
   }
@@ -29,14 +30,14 @@ export default function AddToCart({ productId, stock }: { productId: string; sto
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <label className="text-sm text-ink/60" htmlFor="qty">
+        <label className="text-sm text-ink-muted" htmlFor="qty">
           Quantity
         </label>
         <select
           id="qty"
           value={qty}
           onChange={(e) => setQty(Number(e.target.value))}
-          className="rounded-lg border border-line bg-white px-3 py-1.5 text-sm"
+          className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm"
         >
           {Array.from({ length: maxQty }, (_, i) => i + 1).map((n) => (
             <option key={n} value={n}>
@@ -45,32 +46,33 @@ export default function AddToCart({ productId, stock }: { productId: string; sto
           ))}
         </select>
         {stock <= 5 && (
-          <span className="text-sm text-accent">Only {stock} left</span>
+          <span className="text-sm text-amber-strong">Only {stock} left</span>
         )}
       </div>
 
-      <button
+      <Button
         onClick={() => {
           addToCart(productId, qty);
           setAdded(true);
         }}
-        className="rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark"
+        size="lg"
       >
-        Add to cart
-      </button>
-      <button
+        Add to bag
+      </Button>
+      <Button
+        variant="secondary"
+        size="lg"
         onClick={() => {
           addToCart(productId, qty);
           router.push("/checkout");
         }}
-        className="rounded-full border border-ink px-6 py-3 text-sm font-medium text-ink hover:bg-ink hover:text-white"
       >
         Buy now
-      </button>
+      </Button>
 
       {added && (
         <p className="text-sm text-brand">
-          Added to cart. <a href="/cart" className="underline">View cart</a>
+          Added to bag. <a href="/cart" className="underline">View bag</a>
         </p>
       )}
     </div>

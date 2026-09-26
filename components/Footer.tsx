@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import InfoDialog from "@/components/InfoDialog";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 type Popup = { label: string; message: string };
 
@@ -60,10 +61,10 @@ export default function Footer() {
 
   return (
     <footer className="mt-16 border-t border-line">
-      <div className="mx-auto max-w-7xl px-6 py-12 text-sm text-ink/60">
+      <div className="mx-auto max-w-[1320px] px-6 py-12 text-sm text-ink-muted">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="font-display text-lg text-ink/80">Aura</p>
+            <p className="font-display text-lg text-ink-muted">Aura</p>
             <p className="mt-2 max-w-xs">
               Everyday electronics, home goods, and essentials — shipped from
               Pakistan, with clear pricing and no checkout upsells.
@@ -71,18 +72,18 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-ink/40">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-ink-muted">
               Your account
             </p>
             <ul className="space-y-2">
               <li><Link href="/account" className="hover:text-ink">Account</Link></li>
               <li><Link href="/orders" className="hover:text-ink">Orders</Link></li>
-              <li><Link href="/cart" className="hover:text-ink">Cart</Link></li>
+              <li><Link href="/cart" className="hover:text-ink">Bag</Link></li>
             </ul>
           </div>
 
           <div>
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-ink/40">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-ink-muted">
               Company
             </p>
             <ul className="space-y-2">
@@ -97,7 +98,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-ink/40">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-ink-muted">
               Help
             </p>
             <ul className="space-y-2">
@@ -122,6 +123,7 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {socials.map((s) => (
               <a
                 key={s.label}

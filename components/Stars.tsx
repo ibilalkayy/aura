@@ -12,14 +12,14 @@ export default function Stars({
 
   return (
     <div className={`flex items-center gap-1.5 ${textSize}`}>
-      <div className="flex text-accent" aria-hidden>
+      <div className="flex text-amber" aria-hidden>
         {[0, 1, 2, 3, 4].map((i) => {
           const diff = full - i;
           const glyph = diff >= 1 ? "★" : diff >= 0.5 ? "⯨" : "☆";
           return <span key={i}>{glyph}</span>;
         })}
       </div>
-      <span className="text-ink/60">
+      <span className="text-ink-muted">
         {rating.toFixed(1)}
         {typeof count === "number" ? ` (${count.toLocaleString()})` : ""}
       </span>

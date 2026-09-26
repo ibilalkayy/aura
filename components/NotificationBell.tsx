@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Bell } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import {
   Notification,
@@ -70,9 +71,9 @@ export default function NotificationBell() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Notifications"
-        className="relative flex items-center text-lg hover:opacity-70"
+        className="relative flex items-center text-ink-muted hover:text-ink"
       >
-        🔔
+        <Bell size={19} />
         {unreadCount > 0 && (
           <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
             {unreadCount}
@@ -81,7 +82,7 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-xl border border-line bg-white shadow-lg">
+        <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-xl border border-line bg-surface shadow-lg">
           <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
             <span className="text-sm font-medium text-ink">Notifications</span>
             {unreadCount > 0 && (
@@ -92,7 +93,7 @@ export default function NotificationBell() {
           </div>
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="px-4 py-6 text-center text-sm text-ink/50">No notifications yet.</p>
+              <p className="px-4 py-6 text-center text-sm text-ink-muted">No notifications yet.</p>
             ) : (
               notifications.map((n) => (
                 <button
@@ -103,8 +104,8 @@ export default function NotificationBell() {
                   {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent" />}
                   <div className={n.read ? "ml-4" : ""}>
                     <p className="text-sm font-medium text-ink">{n.title}</p>
-                    <p className="text-xs text-ink/60">{n.message}</p>
-                    <p className="mt-1 text-[11px] text-ink/40">{timeAgo(n.createdAt)}</p>
+                    <p className="text-xs text-ink-muted">{n.message}</p>
+                    <p className="mt-1 text-[11px] text-ink-muted">{timeAgo(n.createdAt)}</p>
                   </div>
                 </button>
               ))

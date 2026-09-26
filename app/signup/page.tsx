@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import PasswordInput from "@/components/PasswordInput";
+import AuthShell from "@/components/AuthShell";
+import Button from "@/components/ui/Button";
 
 export default function SignUpPage() {
   const { signUp } = useAuth();
@@ -29,59 +31,63 @@ export default function SignUpPage() {
     }
   };
 
+  const passwordLongEnough = password.length >= 6;
+
   return (
-    <div className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="font-display text-2xl text-ink mb-1">Create account</h1>
-      <p className="mb-6 text-sm text-ink/60">
-        Your password is handled entirely by Supabase Auth — this app never sees or stores it.
-      </p>
-      <form onSubmit={onSubmit} className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+    <div className="px-4">
+      <AuthShell
+        title="Create account"
+        subtitle="Your password is handled entirely by Supabase Auth — this app never sees or stores it."
+      >
+        <form onSubmit={onSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              required
+              placeholder="First name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
+            />
+            <input
+              required
+              placeholder="Last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
+            />
+          </div>
           <input
             required
-            placeholder="First name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
           />
-          <input
+          <PasswordInput
             required
-            placeholder="Last name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
+            placeholder="Password (min. 6 characters)"
+            minLength={6}
+            value={password}
+            onChange={setPassword}
           />
-        </div>
-        <input
-          required
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-line px-4 py-2.5 text-sm outline-none focus:border-brand"
-        />
-        <PasswordInput
-          required
-          placeholder="Password (min. 6 characters)"
-          minLength={6}
-          value={password}
-          onChange={setPassword}
-        />
-        {error && <p className="text-sm text-accent">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full rounded-full bg-brand px-6 py-3 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-60"
-        >
-          {submitting ? "Creating account…" : "Create account"}
-        </button>
-      </form>
-      <p className="mt-4 text-sm text-ink/60">
-        Already have an account?{" "}
-        <Link href="/login" className="text-brand hover:underline">
-          Log in
-        </Link>
-      </p>
+          {password.length > 0 && (
+            <p className={`text-xs ${passwordLongEnough ? "text-sage-strong" : "text-ink-muted"}`}>
+              {passwordLongEnough ? "✓" : "•"} At least 6 characters
+            </p>
+          )}
+          {error && <p className="text-sm text-danger">{error}</p>}
+          <Button type="submit" disabled={submitting} className="w-full">
+            {submitting ? "Creating account…" : "Create account"}
+          </Button>
+        </form>
+        <p className="mt-4 text-sm text-ink-muted">
+          Already have an account?{" "}
+          <Link href="/login" className="text-brand hover:underline">
+            Log in
+          </Link>
+        </p>
+      </AuthShell>
     </div>
   );
 }

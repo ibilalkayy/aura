@@ -5,6 +5,11 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { categories, searchProducts, Product } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
+import Button from "@/components/ui/Button";
+import { ProductCardSkeleton } from "@/components/ui/Skeleton";
+import { cn } from "@/lib/utils";
+
+const PAGE_SIZE = 12;
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -13,12 +18,16 @@ export default function SearchPage() {
   const sort = (searchParams.get("sort") as "price-asc" | "price-desc" | "rating" | null) ?? undefined;
 
   const [results, setResults] = useState<Product[] | null>(null);
+  const [visible, setVisible] = useState(PAGE_SIZE);
 
   // Real query against Supabase every time the search params change — not a
-  // client-side filter over a one-time full download.
+  // client-side filter over a one-time full download. "Load more" below is
+  // purely a client-side reveal over that already-fetched result set, not
+  // a second query — there's no server-side pagination to replace.
   useEffect(() => {
     let active = true;
     setResults(null);
+    setVisible(PAGE_SIZE);
     searchProducts({ query: q, category, sort }).then((data) => {
       if (active) setResults(data);
     });
@@ -34,20 +43,22 @@ export default function SearchPage() {
     return `/search?${usp.toString()}`;
   };
 
+  const shown = results?.slice(0, visible) ?? [];
+
   return (
-    <div className="mx-auto max-w-7xl px-6 py-10">
+    <div className="mx-auto max-w-[1320px] px-6 py-10">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-2xl text-ink">
           {q ? `Results for “${q}”` : category ? category : "All products"}
           {results !== null && (
-            <span className="ml-2 text-base font-normal text-ink/50">
+            <span className="ml-2 text-base font-normal text-ink-muted">
               ({results.length})
             </span>
           )}
         </h1>
 
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-ink/50">Sort:</span>
+          <span className="text-ink-muted">Sort:</span>
           {[
             { key: "", label: "Featured" },
             { key: "price-asc", label: "Price: low to high" },
@@ -57,11 +68,12 @@ export default function SearchPage() {
             <Link
               key={opt.key}
               href={buildHref({ sort: opt.key || undefined })}
-              className={`rounded-full border px-3 py-1.5 ${
+              className={cn(
+                "rounded-full border px-3 py-1.5",
                 (sort || "") === opt.key
                   ? "border-brand bg-brand text-white"
-                  : "border-line bg-white text-ink/70 hover:border-brand"
-              }`}
+                  : "border-line bg-surface text-ink-muted hover:border-brand"
+              )}
             >
               {opt.label}
             </Link>
@@ -69,12 +81,13 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <div className="mb-8 flex flex-wrap gap-2">
+      <div className="mb-8 flex flex-wrap gap-2 overflow-x-auto">
         <Link
           href={buildHref({ category: undefined })}
-          className={`rounded-full border px-3 py-1.5 text-xs ${
-            !category ? "border-brand bg-brand text-white" : "border-line bg-white text-ink/70"
-          }`}
+          className={cn(
+            "shrink-0 rounded-full border px-3 py-1.5 text-xs",
+            !category ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink-muted"
+          )}
         >
           All categories
         </Link>
@@ -82,9 +95,10 @@ export default function SearchPage() {
           <Link
             key={c}
             href={buildHref({ category: c })}
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              category === c ? "border-brand bg-brand text-white" : "border-line bg-white text-ink/70"
-            }`}
+            className={cn(
+              "shrink-0 rounded-full border px-3 py-1.5 text-xs",
+              category === c ? "border-brand bg-brand text-white" : "border-line bg-surface text-ink-muted"
+            )}
           >
             {c}
           </Link>
@@ -94,23 +108,28 @@ export default function SearchPage() {
       {results === null ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-line bg-white p-4">
-              <div className="aspect-square w-full animate-pulse rounded-xl bg-line" />
-              <div className="mt-3 h-4 w-3/4 animate-pulse rounded bg-line" />
-              <div className="mt-2 h-4 w-1/3 animate-pulse rounded bg-line" />
-            </div>
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
       ) : results.length === 0 ? (
-        <p className="text-ink/60">
+        <p className="text-ink-muted">
           Nothing matched that search. Try a different term or clear the filters.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {results.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {shown.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+          {visible < results.length && (
+            <div className="mt-8 flex justify-center">
+              <Button variant="outline" onClick={() => setVisible((v) => v + PAGE_SIZE)}>
+                Load more
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
